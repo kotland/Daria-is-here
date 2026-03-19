@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Оценка бизнеса 2026</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0c0f08;color:#e0e4d8;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;position:relative}
+
+/* Ambient blobs like reference */
+.blob1{position:fixed;top:-15%;left:-10%;width:55%;height:55%;background:radial-gradient(ellipse,rgba(160,200,80,0.18) 0%,rgba(120,160,50,0.06) 40%,transparent 70%);filter:blur(60px);pointer-events:none;z-index:0;animation:drift1 12s ease-in-out infinite}
+.blob2{position:fixed;bottom:-10%;right:-15%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(140,180,60,0.12) 0%,rgba(100,140,40,0.04) 40%,transparent 70%);filter:blur(50px);pointer-events:none;z-index:0;animation:drift2 15s ease-in-out infinite}
+.blob3{position:fixed;top:40%;left:30%;width:35%;height:35%;background:radial-gradient(ellipse,rgba(180,220,100,0.08) 0%,transparent 60%);filter:blur(40px);pointer-events:none;z-index:0;animation:drift3 10s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,20px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-15px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(10px,-10px) scale(1.1)}}
+
+.app{max-width:480px;margin:0 auto;padding:20px 16px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1}
+
+/* Progress */
+.progress{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:28px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#A4D44E,#C8F06E);border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);width:0%;box-shadow:0 0 12px rgba(164,212,78,0.4)}
+
+/* Screens */
+.screen{display:none;flex:1;flex-direction:column;justify-content:center;animation:fadeIn 0.5s cubic-bezier(0.4,0,0.2,1)}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* Start */
+.start-icon{font-size:48px;text-align:center;margin-bottom:28px;filter:drop-shadow(0 0 24px rgba(164,212,78,0.25))}
+.start-title{font-size:28px;font-weight:800;text-align:center;line-height:1.25;margin-bottom:14px;color:#f0f2ea;letter-spacing:-0.5px}
+.start-title span{color:#C8F06E}
+.start-sub{font-size:15px;color:rgba(255,255,255,0.45);text-align:center;line-height:1.6;margin-bottom:36px;padding:0 8px}
+.start-tag{display:block;width:fit-content;margin:0 auto 36px;background:rgba(164,212,78,0.1);border:1px solid rgba(164,212,78,0.15);color:#C8F06E;font-size:13px;font-weight:600;padding:8px 18px;border-radius:24px;letter-spacing:0.3px}
+
+/* Question */
+.q-num{font-size:12px;color:#A4D44E;font-weight:700;letter-spacing:3px;margin-bottom:14px}
+.q-text{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:32px;color:#f0f2ea;letter-spacing:-0.3px}
+
+/* Glass options — dark cards like reference */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px 20px;font-size:15px;line-height:1.45;color:rgba(255,255,255,0.65);cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);text-align:left;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.opt:hover{background:rgba(164,212,78,0.06);border-color:rgba(164,212,78,0.2);color:rgba(255,255,255,0.85)}
+.opt:active,.opt.selected{background:rgba(164,212,78,0.12);border-color:rgba(164,212,78,0.4);color:#fff;box-shadow:0 0 20px rgba(164,212,78,0.08),inset 0 0 12px rgba(164,212,78,0.04)}
+
+/* Result */
+.result-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:24px;padding:36px 24px;margin-bottom:24px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.result-emoji{font-size:64px;text-align:center;margin-bottom:20px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.result-score{text-align:center;font-size:56px;font-weight:800;margin-bottom:4px;letter-spacing:-2px;color:#C8F06E}
+.result-label{text-align:center;font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:24px;letter-spacing:1px;font-weight:500}
+.result-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;margin-bottom:28px;overflow:hidden}
+.result-bar-fill{height:100%;border-radius:3px;transition:width 1.8s cubic-bezier(0.4,0,0.2,1)}
+.result-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:14px;color:#f0f2ea;letter-spacing:-0.3px}
+.result-text{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.65;text-align:center}
+
+/* Buttons — rounded like reference */
+.btn{display:block;width:100%;padding:16px;border:none;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.3s;text-decoration:none;letter-spacing:0.2px;font-family:'Inter',sans-serif}
+.btn-primary{background:#C8F06E;color:#0c0f08;box-shadow:0 4px 24px rgba(164,212,78,0.2)}
+.btn-primary:hover{background:#d4f58a;box-shadow:0 4px 32px rgba(164,212,78,0.35);transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,0.06);color:#C8F06E;border:1px solid rgba(164,212,78,0.15);margin-top:10px;backdrop-filter:blur(8px)}
+.btn-secondary:hover{background:rgba(164,212,78,0.08)}
+
+.footer{text-align:center;padding:20px 0;font-size:11px;color:rgba(255,255,255,0.15);margin-top:auto;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+<div class="blob1"></div>
+<div class="blob2"></div>
+<div class="blob3"></div>
+<div class="app">
+<div class="progress" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="screen active" id="startScreen">
+<div class="start-icon">🧠</div>
+<div class="start-title">Как ваш бизнес выглядит <span>глазами клиента</span> в 2026?</div>
+<div class="start-tag">10 вопросов · 2 минуты</div>
+<div class="start-sub">Биологический интеллект вашего покупателя изменился. Отзывы, скидки и красивые фото больше не работают как раньше. Узнайте, считывает ли клиент ваш бизнес — или проходит мимо.</div>
+<button class="btn btn-primary" onclick="startQuiz()">Начать диагностику</button>
+</div>
+
+<div class="screen" id="questionScreen">
+<div class="q-num" id="qNum"></div>
+<div class="q-text" id="qText"></div>
+<div class="options" id="options"></div>
+</div>
+
+<div class="screen" id="resultScreen">
+<div class="result-card">
+<div class="result-emoji" id="resEmoji"></div>
+<div class="result-score" id="resScore"></div>
+<div class="result-label">из 40 баллов</div>
+<div class="result-bar"><div class="result-bar-fill" id="resBar"></div></div>
+<div class="result-title" id="resTitle"></div>
+<div class="result-text" id="resText"></div>
+</div>
+<button class="btn btn-primary" onclick="shareResult()">Поделиться результатом</button>
+<a class="btn btn-secondary" href="https://t.me/daria_kotenkova" target="_blank">Хочу разобрать бизнес подробнее →</a>
+</div>
+
+<div class="footer">Основано на исследованиях биологического интеллекта 2026</div>
+</div>
+
+<script>
+const questions=[
+{q:"Как клиент впервые узнаёт о вас?",opts:[{t:"Через поиск / GPT / маркетплейс",p:1},{t:"Через соцсети / рекламу",p:2},{t:"Через рекомендацию знакомого",p:3},{t:"Он сам не знает — просто увидел и остался",p:4}]},
+{q:"Что вы показываете как доказательство качества?",opts:[{t:"Ничего — продукт говорит сам за себя",p:1},{t:"Отзывы и рейтинги",p:2},{t:"Кейсы / портфолио / до-после",p:3},{t:"Процесс работы и закулисье",p:4}]},
+{q:"Видит ли клиент вашу команду?",opts:[{t:"Нет, только логотип и продукт",p:1},{t:"Есть фото команды на сайте",p:2},{t:"Команда появляется в контенте регулярно",p:3},{t:"Команда — лицо бренда, их знают по именам",p:4}]},
+{q:"С чего начинается контакт клиента с вами?",opts:[{t:"С цены / каталога / выбора",p:1},{t:"С описания продукта / услуги",p:2},{t:"С бесплатной пользы — гайд, тест, консультация",p:3},{t:"С истории / видео / эмоции",p:4}]},
+{q:"Сколько времени клиенту нужно чтобы понять — «моё или нет»?",opts:[{t:"Не знаю, никогда не замерял",p:1},{t:"Должен изучить — много текста и характеристик",p:2},{t:"1–2 минуты — понятно из визуала",p:3},{t:"5–10 секунд — чувствует сразу",p:4}]},
+{q:"Ваш продукт решает задачу или создаёт ощущение?",opts:[{t:"Чисто задача — починить, доставить, научить",p:1},{t:"Больше задача, но есть эмоциональная обёртка",p:2},{t:"50/50 — задача и ощущение равны",p:3},{t:"Больше ощущение и принадлежность",p:4}]},
+{q:"Зачем клиент возвращается к вам повторно?",opts:[{t:"Дешевле или удобнее конкурентов",p:1},{t:"Привычка",p:2},{t:"Нравится процесс взаимодействия",p:3},{t:"Чувствует себя частью чего-то",p:4}]},
+{q:"Если клиент спросит GPT «стоит ли покупать у вас» — что он получит?",opts:[{t:"Нас вообще нет в интернете",p:1},{t:"Базовая информация — сайт, соцсети",p:2},{t:"Отзывы, статьи, упоминания",p:3},{t:"Целую историю — кто мы, зачем, чем отличаемся",p:4}]},
+{q:"Используете ли вы ИИ в бизнесе?",opts:[{t:"Нет",p:1},{t:"Для внутренних задач — тексты, аналитика",p:2},{t:"Клиент взаимодействует с ИИ — бот, рекомендации",p:3},{t:"ИИ встроен в продукт",p:4}]},
+{q:"Ваш бренд — это вы лично или можно без вас?",opts:[{t:"Без меня ничего не работает",p:1},{t:"Бренд самостоятельный, я за кулисами",p:2},{t:"Я — лицо, но есть система",p:3},{t:"Личный бренд и бренд продукта усиливают друг друга",p:4}]}
+];
+const results=[
+{min:10,max:17,emoji:"🔴",title:"Ваш бизнес невидим для клиента 2026",text:"Ваш бизнес говорит на языке 2023 года. Биологический интеллект клиента не получает сигналов доверия — отзывы больше не работают, команду не видно, первое касание начинается с цены.",color:"linear-gradient(90deg,#FF4D6A,#FF6B81)"},
+{min:18,max:25,emoji:"🟡",title:"Вас покупают, но не любят",text:"Продукт хороший, но вы продаёте характеристики, а не ощущения. Клиент покупает — но не возвращается по любви. Один сильный конкурент — и клиенты уйдут.",color:"linear-gradient(90deg,#FFB84D,#FFD700)"},
+{min:26,max:33,emoji:"🟢",title:"Вы чувствуете тренды",text:"Клиент выбирает вас не только логикой. Вы адаптируетесь и растёте. Есть над чем работать — но фундамент сильный.",color:"linear-gradient(90deg,#7DD44E,#A4E878)"},
+{min:34,max:40,emoji:"💎",title:"Вы в 1% рынка",text:"Ваш бизнес говорит с биологическим интеллектом клиента. Доверие, энергия, прозрачность. Клиенты возвращаются за ощущением — не за продуктом.",color:"linear-gradient(90deg,#A4D44E,#C8F06E)"}
+];
+let current=-1,score=0;
+function startQuiz(){current=0;score=0;showQuestion()}
+function showQuestion(){
+document.getElementById('startScreen').classList.remove('active');
+document.getElementById('resultScreen').classList.remove('active');
+const qs=document.getElementById('questionScreen');qs.classList.remove('active');void qs.offsetWidth;qs.classList.add('active');
+const q=questions[current];document.getElementById('qNum').textContent=`ВОПРОС ${current+1} ИЗ 10`;
+document.getElementById('qText').textContent=q.q;document.getElementById('progressFill').style.width=((current)/10*100)+'%';
+const opts=document.getElementById('options');opts.innerHTML='';
+[...q.opts].sort(()=>Math.random()-0.5).forEach(o=>{const d=document.createElement('div');d.className='opt';d.textContent=o.t;d.onclick=()=>selectAnswer(d,o.p);opts.appendChild(d)});
+}
+function selectAnswer(el,p){document.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');score+=p;setTimeout(()=>{current++;current<10?showQuestion():showResult()},450)}
+function showResult(){
+document.getElementById('questionScreen').classList.remove('active');document.getElementById('progressFill').style.width='100%';
+const r=results.find(r=>score>=r.min&&score<=r.max)||results[0];
+document.getElementById('resEmoji').textContent=r.emoji;document.getElementById('resScore').textContent=score;
+document.getElementById('resTitle').textContent=r.title;document.getElementById('resText').textContent=r.text;
+const bar=document.getElementById('resBar');bar.style.background=r.color;setTimeout(()=>{bar.style.width=(score/40*100)+'%'},100);
+document.getElementById('resultScreen').classList.add('active');
+if(window.Telegram&&Telegram.WebApp){try{Telegram.WebApp.HapticFeedback.notificationOccurred('success')}catch(e){}}
+}
+function shareResult(){const r=results.find(r=>score>=r.min&&score<=r.max)||results[0];
+const t=`🧠 Мой бизнес глазами клиента 2026: ${score}/40\n${r.title}\n\nПройди тест: https://kotland.github.io/biz-diagnostic-2026/`;
+if(navigator.share){navigator.share({text:t}).catch(()=>{})}else{navigator.clipboard.writeText(t).then(()=>{event.target.textContent='✓ Скопировано';setTimeout(()=>event.target.textContent='Поделиться результатом',2000)})}}
+if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand()}
+</script>
+</body>
+</html>
